@@ -5,19 +5,19 @@ const SomeText = () => {
   return (
     <Grid textAlign="center">
       <Heading as="h1" size="lg">
-        Welcome to{' '}
         <ChakraLink
-          color="green.200"
-          href="https://help.form.io"
+          color="blue.200"
+          href="https://promptengineers.ai"
           isExternal
           rel="noopener noreferrer"
         >
-          Form.io GPT
-        </ChakraLink>
+          Prompt Engineers
+        </ChakraLink>{' '}
+        Chat Starter
       </Heading>
 
-      <Text fontSize="s">
-        This chatbot is equipped with the full documentation from Form.io
+      <Text fontSize="xs">
+        This is a Next.js app with Chakra-UI and TypeScript setup.
       </Text>
     </Grid>
   );

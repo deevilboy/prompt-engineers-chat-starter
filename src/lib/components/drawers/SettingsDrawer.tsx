@@ -63,7 +63,7 @@ export default function SettingsDrawer() {
   return (
     <>
       <Tooltip label="Settings">
-        <Button size="sm" onClick={onOpen} colorScheme="green">
+        <Button size="sm" onClick={onOpen} colorScheme="blue">
           <Icon fontSize="18px" as={AiFillSetting} />
         </Button>
       </Tooltip>
