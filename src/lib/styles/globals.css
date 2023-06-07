@@ -75,6 +75,18 @@
   font-weight: 600;
 }
 
+.source-link {
+  color: lightblue;
+}
+
+.well {
+  padding: 10px;
+  margin-bottom: 5px;
+  background-color: #2C313D;
+  border: 1px solid #1A202C;
+  border-radius: 4px;
+}
+
 @media (max-width: 500px) {
   .main-window {
     height: 76vh;

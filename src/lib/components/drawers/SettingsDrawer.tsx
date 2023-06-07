@@ -21,17 +21,15 @@ import {
   Icon,
   FormControl,
   Select,
+  Checkbox,
 } from '@chakra-ui/react';
 import { useState, useRef } from 'react';
 import { AiFillSetting } from 'react-icons/ai';
 import { MdGraphicEq } from 'react-icons/md';
 import { RxReset } from 'react-icons/rx';
-
+import { Defaults } from '../../config/prompt';
 import { ChatModels } from '../../config/index';
-import {
-  defaultSystemMessage,
-  useChatContext,
-} from '../../contexts/ChatContext';
+import { useChatContext } from '../../contexts/ChatContext';
 
 export default function SettingsDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -43,10 +41,17 @@ export default function SettingsDrawer() {
     setTemperature,
     setChatModel,
     chatModel,
+    sourcesEnabled,
+    setSourcesEnabled
   } = useChatContext();
 
   const handleSliderChange = (e: { target: { value: string } }) => {
     setTemperature(parseInt(e.target.value, 10));
+  };
+
+  const handleCheckboxChange = (e: { target: { checked: any } }) => {
+    setSourcesEnabled(e.target.checked);
+    sessionStorage.setItem('sources', e.target.checked);
   };
 
   const handleModelChange = (e: { target: { value: any } }) => {
@@ -70,7 +75,9 @@ export default function SettingsDrawer() {
             <Stack spacing="24px">
               <Box mt={5}>
                 <FormControl mt={3} position="relative">
-                  {systemMessage === defaultSystemMessage ? null : (
+                  {systemMessage === Defaults.SYSTEM_MESSAGE_CONTEXTGPT 
+                  ? null 
+                  : (
                     <Tooltip label="Reset System Message">
                       <Button
                         zIndex={100}
@@ -83,7 +90,7 @@ export default function SettingsDrawer() {
                         top="-5px"
                         onClick={() => {
                           sessionStorage.removeItem('systemMessage');
-                          setSystemMessage(defaultSystemMessage);
+                          setSystemMessage(Defaults.SYSTEM_MESSAGE_CONTEXTGPT);
                         }}
                       >
                         <Icon fontSize="20px" as={RxReset} />
@@ -156,14 +163,24 @@ export default function SettingsDrawer() {
                     onChange={handleModelChange}
                     value={chatModel}
                   >
-                    <option value={ChatModels.GPT_3_5}>gpt-3.5-turbo</option>
-                    {/* <option value='gpt-3.5-turbo-0301'>gpt-3.5-turbo-0301</option> */}
-                    <option value={ChatModels.GPT_4}>gpt-4</option>
-                    {/* <option value='gpt-4-0314'>gpt-4-0314</option> */}
-                    {/* <option value={ChatModels.GPT_4_32K}>gpt-4-32k</option> */}
-                    {/* <option value='gpt-4-32k-0314'>gpt-4-32k-0314</option> */}
+                    <option value={ChatModels.GPT_3_5}>
+                      gpt-3.5-turbo &#40;Faster&#41;
+                    </option>
+                    <option value={ChatModels.GPT_4}>
+                      gpt-4 &#40;Smarter&#41;
+                    </option>
                   </Select>
                 </FormControl>
+                <Box mt={3}>
+                  <FormLabel>
+                    <Checkbox
+                      onChange={handleCheckboxChange}
+                      isChecked={sourcesEnabled}
+                    >
+                      Source Docs
+                    </Checkbox>
+                  </FormLabel>
+                </Box>
               </Box>
             </Stack>
           </DrawerBody>
