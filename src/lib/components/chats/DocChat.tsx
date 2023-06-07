@@ -43,7 +43,7 @@ export default function DocChat() {
     websckt,
     setWebsckt,
     chatModel,
-    isChecked,
+    sourcesEnabled,
   } = useChatContext();
   const [question, setQuestion] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);
@@ -76,7 +76,7 @@ export default function DocChat() {
         system: systemMessage,
         temperature: temperature / 100,
         model: chatModel,
-        sources: isChecked,
+        sources: sourcesEnabled,
       })
     );
     setQuestion('');
@@ -146,9 +146,6 @@ export default function DocChat() {
                         : colorMode === 'light'
                         ? 'white'
                         : MAIN_BG,
-                    // background: colorMode === 'light' ? 'whitesmoke' : '#171923',
-                    // padding: "10px",
-                    // whiteSpace: 'pre-line'
                     fontSize: '14px',
                     position: 'relative',
                   }}

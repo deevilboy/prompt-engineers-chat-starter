@@ -1,48 +1,41 @@
-import { useColorMode } from '@chakra-ui/react';
 import { useContext, createContext, useState, useEffect } from 'react';
 
 import {
   API_KEY,
   AWS_BUCKET_NAME,
   DEFAULT_CHAT_MODEL,
+  HAS_PROXY,
   HOST,
   VECTORSTORE_FILE_PATH,
 } from '../config';
+import { Defaults } from '../config/prompt';
 import type { IContextProvider } from '../interfaces/Provider';
-
-type Message = {
-  content: string;
-  className: string;
-};
-
-export const defaultSystemMessage = `PERSONA:
-Imagine you super intelligent AI assistant for the context.
-
-INSTRUCTION:
-Use the following pieces of context to answer the question at the end. If you don't know the answer or if the required code is not present, just say that you don't know, and don't try to make up an answer. 
-
-OUTPUT FORMAT RULES:
-Code snippets should be wrapped in triple backticks, along with the language name for proper formatting, if applicable.`;
+import type { Message } from '../types/chat';
+import { removeElementsFromIndex } from '../utils/format';
 
 export const ChatContext = createContext({});
+
 export default function ChatProvider({ children }: IContextProvider) {
-  const { colorMode } = useColorMode();
   const [websckt, setWebsckt] = useState<WebSocket>();
   const [connected, setConnected] = useState(true);
-  const oldColor = colorMode === 'light' ? 'cyan' : 'red';
-  const newColor = colorMode === 'light' ? 'red' : 'cyan';
   // Settings
+  const [sourcesEnabled, setSourcesEnabled] = useState(false);
   const [chatModel, setChatModel] = useState(DEFAULT_CHAT_MODEL);
   const [header, setHeader] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [temperature, setTemperature] = useState<number>(90);
-  const [systemMessage, setSystemMessage] = useState(defaultSystemMessage);
+  const [systemMessage, setSystemMessage] = useState(
+    Defaults.SYSTEM_MESSAGE_CONTEXTGPT
+  );
   const [params, setParams] = useState({
     bucketName: AWS_BUCKET_NAME || 'prompt-engineers-dev',
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
   });
-  const [wsUrl, setWsUrl] = useState(`${HOST}/formio-proxy`);
-  const [isChecked, setIsChecked] = useState(false);
+  const [wsUrl, setWsUrl] = useState(
+    HAS_PROXY 
+    ? `${HOST}/formio-proxy` 
+    : `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
+  );  
 
   const addMessage = (content: any, className: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, className }]);
@@ -63,11 +56,70 @@ export default function ChatProvider({ children }: IContextProvider) {
     });
   };
 
+  const extractSources = (text: string): string[] | null => {
+    const lowerCaseText = text.toLowerCase();
+    const sourcesKeyword = 'sources:';
+    const sourcesIndex = lowerCaseText.indexOf(sourcesKeyword);
+
+    if (sourcesIndex === -1) {
+      return null;
+    }
+
+    const sourcesText = text.substring(sourcesIndex + sourcesKeyword.length);
+    return sourcesText.split(/,|\n-/).map((source) => source.trim());
+  };
+
+  const wrapSourcesInAnchorTags = (sources: string[]): string[] => {
+    return sources.map(
+      (source) =>
+        `<a href="${source.replace(
+          'rtdocs',
+          'https:/'
+        )}" target="_blank" class="source-link"><div class="well">${source.replace(
+          'rtdocs',
+          'https:/'
+        )}</div></a>`
+    );
+  };
+
+  const removeSources = (text: string): string => {
+    return text.replace(/(sources:)[\s\S]*/i, '').trim();
+  };
+
+  const resetSession = () => {
+    if (HAS_PROXY) {
+      console.log('resetting session');
+      setMessages([]);
+      websckt?.close();
+      // This will not connect but is here to reset the connection by changing the wsUrl
+      setWsUrl(`${HOST}/formio-proxy?test=1234`);
+      // This will reconnect to create a new session
+      setTimeout(() => {
+        setWsUrl(`${HOST}/formio-proxy`);
+      }, 500);
+    } else {
+      console.log('resetting session');
+      setMessages([]);
+      websckt?.close();
+      // This will not connect but is here to reset the connection by changing the wsUrl
+      setWsUrl(`${HOST}/chat-vector-db`);
+      // This will reconnect to create a new session
+      setTimeout(() => {
+        setWsUrl(`${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`);
+      }, 500);
+    }
+  }
+
+  const disconnect = () => {
+    setConnected(false);
+    websckt?.close();
+  };
+
   /**
    * Loads the messages into the UI
    * @param event
    */
-  function loadMessages(event: any) {
+  const loadMessages = (event: any) => {
     const data = JSON.parse(event.data);
     // console.log(data);
     if (data.sender === 'bot') {
@@ -88,24 +140,7 @@ export default function ChatProvider({ children }: IContextProvider) {
     } else {
       addMessage(data.message, 'client-message');
     }
-  }
-
-  function resetSession() {
-    console.log('resetting session');
-    setMessages([]);
-    websckt?.close();
-    // This will not connect but is here to reset the connection by changing the wsUrl
-    setWsUrl(`${HOST}/formio-proxy?test=1234`);
-    setTimeout(() => {
-      setWsUrl(`${HOST}/formio-proxy`);
-    }, 500);
-    // This will reconnect to create a new session
-  }
-
-  function disconnect() {
-    setConnected(false);
-    websckt?.close();
-  }
+  };
 
   useEffect(() => {
     const prevModelExists = sessionStorage.getItem('model');
@@ -122,16 +157,28 @@ export default function ChatProvider({ children }: IContextProvider) {
   }, [systemMessage]);
 
   useEffect(() => {
-    const prevExists = sessionStorage.getItem('sources');
-    if (prevExists) {
-      setIsChecked(prevExists !== 'false');
+    if (messages.length >= 1) {
+      // Get the last message
+      const lastElement = messages[messages.length - 1];
+      let sources = extractSources(lastElement.content);
+      if (sources) {
+        // Return all the source links and remove empties
+        sources = sources.filter(function (e) {
+          return e;
+        });
+        // Remove the sources text from the last message content
+        const remove = removeSources(lastElement.content);
+        const arr = removeElementsFromIndex(messages, messages.length - 1);
+        arr.push({ className: lastElement.className, content: '' });
+        setMessages(arr);
+        // Wrap with anchor tags
+        const wrappedSources = wrapSourcesInAnchorTags(sources);
+        // Update the last message with the formmated tags.
+        const reformatted = `${remove}\n\n${wrappedSources.join('\n')}`;
+        updateLastMessage(reformatted);
+      }
     }
-  }, [isChecked]);
-
-  // useEffect(() => {
-  //   const switchColor = messages.replace(new RegExp(oldColor, 'g'), newColor);
-  //   setMessages(switchColor);
-  // }, [colorMode]);
+  }, [header]);
 
   return (
     <ChatContext.Provider
@@ -156,8 +203,8 @@ export default function ChatProvider({ children }: IContextProvider) {
         setWebsckt,
         chatModel,
         setChatModel,
-        isChecked,
-        setIsChecked,
+        sourcesEnabled,
+        setSourcesEnabled,
         resetSession,
       }}
     >

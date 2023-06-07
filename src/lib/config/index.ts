@@ -3,6 +3,8 @@ export const HOST =
 // export const HOST = 'ws://localhost:8000';
 export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY;
 
+export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY || false
+
 export const AWS_BUCKET_NAME =
   process.env.NEXT_PUBLIC_AWS_BUCKET_NAME || 'prompt-engineers-dev';
 export const VECTORSTORE_FILE_PATH =
