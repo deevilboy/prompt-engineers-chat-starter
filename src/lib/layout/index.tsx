@@ -10,7 +10,6 @@ import {
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { IoMdAdd } from 'react-icons/io';
-// import SettingsDrawer from '../components/drawers/SettingsDrawer';
 
 import {
   APP_TITLE,
@@ -52,8 +51,8 @@ const Layout = ({ children }: LayoutProps) => {
           >
             {isLargerThanLG && (
               <Box textAlign="center">
-                {/* <ChakraLink href={CONTEXT_LINK} color={SECONDARY}>{APP_TITLE}</ChakraLink>{' '} */}
-                <Image src={LOGO_LINK} alt="Form.io" />
+                <ChakraLink href={CONTEXT_LINK} color={SECONDARY}>{APP_TITLE}</ChakraLink>{' '}
+                {/* <Image src={LOGO_LINK} alt="Form.io" /> */}
                 {APP_VERSION ? `- ${APP_VERSION}` : null}
                 <Text fontSize="xs" colorScheme="green">
                   <Link

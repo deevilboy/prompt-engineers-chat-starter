@@ -23,16 +23,14 @@ import {
   Select,
   Checkbox,
 } from '@chakra-ui/react';
-import { useState, useRef } from 'react';
+import { useRef } from 'react';
 import { AiFillSetting } from 'react-icons/ai';
 import { MdGraphicEq } from 'react-icons/md';
 import { RxReset } from 'react-icons/rx';
 
 import { ChatModels, MAIN_BG, SECONDARY } from '../../config/index';
-import {
-  defaultSystemMessage,
-  useChatContext,
-} from '../../contexts/ChatContext';
+import { Defaults } from '../../config/prompt';
+import { useChatContext } from '../../contexts/ChatContext';
 
 export default function SettingsDrawer() {
   const { isOpen, onOpen, onClose } = useDisclosure();
@@ -44,8 +42,8 @@ export default function SettingsDrawer() {
     setTemperature,
     setChatModel,
     chatModel,
-    setIsChecked,
-    isChecked,
+    sourcesEnabled,
+    setSourcesEnabled,
   } = useChatContext();
 
   const handleSliderChange = (e: { target: { value: string } }) => {
@@ -53,7 +51,7 @@ export default function SettingsDrawer() {
   };
 
   const handleCheckboxChange = (e: { target: { checked: any } }) => {
-    setIsChecked(e.target.checked);
+    setSourcesEnabled(e.target.checked);
     sessionStorage.setItem('sources', e.target.checked);
   };
 
@@ -65,7 +63,7 @@ export default function SettingsDrawer() {
   return (
     <>
       <Tooltip label="Settings">
-        <Button size="sm" onClick={onOpen} colorScheme="green">
+        <Button size="sm" onClick={onOpen} colorScheme="blue">
           <Icon fontSize="18px" as={AiFillSetting} />
         </Button>
       </Tooltip>
@@ -78,7 +76,8 @@ export default function SettingsDrawer() {
             <Stack spacing="24px">
               <Box mt={5}>
                 <FormControl mt={3} position="relative">
-                  {systemMessage === defaultSystemMessage ? null : (
+                  {systemMessage ===
+                  Defaults.SYSTEM_MESSAGE_CONTEXTGPT ? null : (
                     <Tooltip label="Reset System Message">
                       <Button
                         zIndex={100}
@@ -91,7 +90,7 @@ export default function SettingsDrawer() {
                         top="-5px"
                         onClick={() => {
                           sessionStorage.removeItem('systemMessage');
-                          setSystemMessage(defaultSystemMessage);
+                          setSystemMessage(Defaults.SYSTEM_MESSAGE_CONTEXTGPT);
                         }}
                       >
                         <Icon fontSize="20px" as={RxReset} />
@@ -177,7 +176,7 @@ export default function SettingsDrawer() {
                   <FormLabel>
                     <Checkbox
                       onChange={handleCheckboxChange}
-                      isChecked={isChecked}
+                      isChecked={sourcesEnabled}
                     >
                       Source Docs
                     </Checkbox>

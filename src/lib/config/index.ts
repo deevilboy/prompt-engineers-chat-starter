@@ -1,7 +1,8 @@
 export const HOST =
   process.env.NEXT_PUBLIC_HOST || 'wss://api.promptengineers.ai';
-// export const HOST = 'ws://localhost:8000';
 export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY;
+export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY === 'true' 
+                        ? true : false
 
 export const AWS_BUCKET_NAME =
   process.env.NEXT_PUBLIC_AWS_BUCKET_NAME || 'prompt-engineers-dev';
@@ -24,7 +25,7 @@ export const CONTEXT_LINK =
 
 export const SIDEBAR_COLOR = '#000';
 export const MAIN_BG = '#333';
-export const SECONDARY = '#6AB148';
+export const SECONDARY = '#90CDF4';
 export const CLIENT_MSG_BG = '#272822';
 
 export const APP_NAME = 'Formio GPT';

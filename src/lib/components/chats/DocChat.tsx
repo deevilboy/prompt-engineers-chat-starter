@@ -1,21 +1,17 @@
 import {
   Box,
-  Button,
   Text,
-  Flex,
   FormControl,
-  FormHelperText,
   IconButton,
   InputGroup,
   InputRightElement,
   Textarea,
   useColorMode,
   useColorModeValue,
-  Link,
 } from '@chakra-ui/react';
-import { useState, useRef, useEffect, CSSProperties } from 'react';
-import { TbSend } from 'react-icons/tb';
 import ReactMarkdown from 'react-markdown';
+import { useState, useRef, useEffect } from 'react';
+import { TbSend } from 'react-icons/tb';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import rehypeRaw from 'rehype-raw';
@@ -43,7 +39,7 @@ export default function DocChat() {
     websckt,
     setWebsckt,
     chatModel,
-    isChecked,
+    sourcesEnabled,
   } = useChatContext();
   const [question, setQuestion] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);
@@ -76,7 +72,7 @@ export default function DocChat() {
         system: systemMessage,
         temperature: temperature / 100,
         model: chatModel,
-        sources: isChecked,
+        sources: sourcesEnabled,
       })
     );
     setQuestion('');
@@ -146,9 +142,6 @@ export default function DocChat() {
                         : colorMode === 'light'
                         ? 'white'
                         : MAIN_BG,
-                    // background: colorMode === 'light' ? 'whitesmoke' : '#171923',
-                    // padding: "10px",
-                    // whiteSpace: 'pre-line'
                     fontSize: '14px',
                     position: 'relative',
                   }}
