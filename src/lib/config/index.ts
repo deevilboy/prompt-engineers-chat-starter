@@ -1,8 +1,7 @@
 export const HOST =
   process.env.NEXT_PUBLIC_HOST || 'wss://api.promptengineers.ai';
 export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY;
-export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY === 'true' 
-                        ? true : false
+export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY === 'true';
 
 export const AWS_BUCKET_NAME =
   process.env.NEXT_PUBLIC_AWS_BUCKET_NAME || 'prompt-engineers-dev';

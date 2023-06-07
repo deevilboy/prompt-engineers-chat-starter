@@ -32,10 +32,10 @@ export default function ChatProvider({ children }: IContextProvider) {
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
   });
   const [wsUrl, setWsUrl] = useState(
-    HAS_PROXY 
-    ? `${HOST}/formio-proxy` 
-    : `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
-  );  
+    HAS_PROXY
+      ? `${HOST}/formio-proxy`
+      : `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
+  );
 
   const addMessage = (content: any, className: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, className }]);
@@ -105,10 +105,12 @@ export default function ChatProvider({ children }: IContextProvider) {
       setWsUrl(`${HOST}/chat-vector-db`);
       // This will reconnect to create a new session
       setTimeout(() => {
-        setWsUrl(`${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`);
+        setWsUrl(
+          `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
+        );
       }, 500);
     }
-  }
+  };
 
   const disconnect = () => {
     setConnected(false);

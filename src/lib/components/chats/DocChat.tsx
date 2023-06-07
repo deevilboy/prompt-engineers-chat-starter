@@ -9,9 +9,9 @@ import {
   useColorMode,
   useColorModeValue,
 } from '@chakra-ui/react';
-import ReactMarkdown from 'react-markdown';
 import { useState, useRef, useEffect } from 'react';
 import { TbSend } from 'react-icons/tb';
+import ReactMarkdown from 'react-markdown';
 import { Prism as SyntaxHighlighter } from 'react-syntax-highlighter';
 import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import rehypeRaw from 'rehype-raw';

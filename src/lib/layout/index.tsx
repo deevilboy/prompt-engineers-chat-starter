@@ -51,7 +51,9 @@ const Layout = ({ children }: LayoutProps) => {
           >
             {isLargerThanLG && (
               <Box textAlign="center">
-                <ChakraLink href={CONTEXT_LINK} color={SECONDARY}>{APP_TITLE}</ChakraLink>{' '}
+                <ChakraLink href={CONTEXT_LINK} color={SECONDARY}>
+                  {APP_TITLE}
+                </ChakraLink>{' '}
                 {/* <Image src={LOGO_LINK} alt="Form.io" /> */}
                 {APP_VERSION ? `- ${APP_VERSION}` : null}
                 <Text fontSize="xs" colorScheme="green">
