@@ -42,7 +42,7 @@ export default function DocChat() {
     websckt,
     setWebsckt,
     chatModel,
-    sourcesEnabled
+    sourcesEnabled,
   } = useChatContext();
   const [question, setQuestion] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);

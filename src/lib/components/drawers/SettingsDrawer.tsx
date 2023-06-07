@@ -27,8 +27,9 @@ import { useState, useRef } from 'react';
 import { AiFillSetting } from 'react-icons/ai';
 import { MdGraphicEq } from 'react-icons/md';
 import { RxReset } from 'react-icons/rx';
-import { Defaults } from '../../config/prompt';
+
 import { ChatModels } from '../../config/index';
+import { Defaults } from '../../config/prompt';
 import { useChatContext } from '../../contexts/ChatContext';
 
 export default function SettingsDrawer() {
@@ -42,7 +43,7 @@ export default function SettingsDrawer() {
     setChatModel,
     chatModel,
     sourcesEnabled,
-    setSourcesEnabled
+    setSourcesEnabled,
   } = useChatContext();
 
   const handleSliderChange = (e: { target: { value: string } }) => {
@@ -75,9 +76,8 @@ export default function SettingsDrawer() {
             <Stack spacing="24px">
               <Box mt={5}>
                 <FormControl mt={3} position="relative">
-                  {systemMessage === Defaults.SYSTEM_MESSAGE_CONTEXTGPT 
-                  ? null 
-                  : (
+                  {systemMessage ===
+                  Defaults.SYSTEM_MESSAGE_CONTEXTGPT ? null : (
                     <Tooltip label="Reset System Message">
                       <Button
                         zIndex={100}

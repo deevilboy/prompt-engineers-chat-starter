@@ -1,5 +1,4 @@
-
 export type Message = {
-    content: string;
-    className: string;
+  content: string;
+  className: string;
 };

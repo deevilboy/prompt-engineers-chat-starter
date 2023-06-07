@@ -1,4 +1,5 @@
 import { useContext, createContext, useState, useEffect } from 'react';
+
 import {
   API_KEY,
   AWS_BUCKET_NAME,
@@ -6,11 +7,10 @@ import {
   HOST,
   VECTORSTORE_FILE_PATH,
 } from '../config';
-import { Message } from '../types/chat';
 import { Defaults } from '../config/prompt';
 import type { IContextProvider } from '../interfaces/Provider';
+import type { Message } from '../types/chat';
 import { removeElementsFromIndex } from '../utils/format';
-
 
 export const ChatContext = createContext({});
 
@@ -23,7 +23,9 @@ export default function ChatProvider({ children }: IContextProvider) {
   const [header, setHeader] = useState('');
   const [messages, setMessages] = useState<Message[]>([]);
   const [temperature, setTemperature] = useState<number>(90);
-  const [systemMessage, setSystemMessage] = useState(Defaults.SYSTEM_MESSAGE_CONTEXTGPT);
+  const [systemMessage, setSystemMessage] = useState(
+    Defaults.SYSTEM_MESSAGE_CONTEXTGPT
+  );
   const [params, setParams] = useState({
     bucketName: AWS_BUCKET_NAME || 'prompt-engineers-dev',
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
@@ -53,33 +55,38 @@ export default function ChatProvider({ children }: IContextProvider) {
 
   const extractSources = (text: string): string[] | null => {
     const lowerCaseText = text.toLowerCase();
-    const sourcesKeyword = "sources:";
+    const sourcesKeyword = 'sources:';
     const sourcesIndex = lowerCaseText.indexOf(sourcesKeyword);
-  
+
     if (sourcesIndex === -1) {
       return null;
     }
-  
+
     const sourcesText = text.substring(sourcesIndex + sourcesKeyword.length);
-    const sources = sourcesText.split(/,|\n-/).map(source => source.trim());
-  
-    return sources;
-  }
+    return sourcesText.split(/,|\n-/).map((source) => source.trim());
+  };
 
   const wrapSourcesInAnchorTags = (sources: string[]): string[] => {
     return sources.map(
-        source => `<a href="${source.replace('rtdocs', 'https:/')}" target="_blank" class="source-link"><div class="well">${source.replace('rtdocs', 'https:/')}</div></a>`
+      (source) =>
+        `<a href="${source.replace(
+          'rtdocs',
+          'https:/'
+        )}" target="_blank" class="source-link"><div class="well">${source.replace(
+          'rtdocs',
+          'https:/'
+        )}</div></a>`
     );
-  }
+  };
 
   const removeSources = (text: string): string => {
     return text.replace(/(sources:)[\s\S]*/i, '').trim();
-  }
+  };
 
   const disconnect = () => {
     setConnected(false);
     websckt?.close();
-  }
+  };
 
   /**
    * Loads the messages into the UI
@@ -106,7 +113,7 @@ export default function ChatProvider({ children }: IContextProvider) {
     } else {
       addMessage(data.message, 'client-message');
     }
-  }
+  };
 
   useEffect(() => {
     const prevModelExists = sessionStorage.getItem('model');
@@ -123,26 +130,28 @@ export default function ChatProvider({ children }: IContextProvider) {
   }, [systemMessage]);
 
   useEffect(() => {
-    if(messages.length >= 1) {
+    if (messages.length >= 1) {
       // Get the last message
-      const lastElement = messages[messages.length-1];
-      let sources = extractSources(lastElement.content)
+      const lastElement = messages[messages.length - 1];
+      let sources = extractSources(lastElement.content);
       if (sources) {
         // Return all the source links and remove empties
-        sources = sources.filter(function(e){return e}); 
+        sources = sources.filter(function (e) {
+          return e;
+        });
         // Remove the sources text from the last message content
-        const remove = removeSources(lastElement.content)
-        const arr = removeElementsFromIndex(messages, (messages.length-1))
-        arr.push({className: lastElement.className, content: ""});
-        setMessages(arr)
+        const remove = removeSources(lastElement.content);
+        const arr = removeElementsFromIndex(messages, messages.length - 1);
+        arr.push({ className: lastElement.className, content: '' });
+        setMessages(arr);
         // Wrap with anchor tags
         const wrappedSources = wrapSourcesInAnchorTags(sources);
         // Update the last message with the formmated tags.
-        const reformatted = remove + '\n\n' + wrappedSources.join('\n');
+        const reformatted = `${remove}\n\n${wrappedSources.join('\n')}`;
         updateLastMessage(reformatted);
       }
-    } 
-  }, [header])
+    }
+  }, [header]);
 
   return (
     <ChatContext.Provider
@@ -168,7 +177,7 @@ export default function ChatProvider({ children }: IContextProvider) {
         chatModel,
         setChatModel,
         sourcesEnabled,
-        setSourcesEnabled
+        setSourcesEnabled,
       }}
     >
       {children}
