@@ -17,15 +17,17 @@ import { okaidia } from 'react-syntax-highlighter/dist/cjs/styles/prism';
 import rehypeRaw from 'rehype-raw';
 
 import { useChatContext } from '../../contexts/ChatContext';
+import { ChatClient } from '../../utils/api';
 import CTASection from '../samples/CTASection';
 import SomeText from '../samples/SomeText';
-import { CLIENT_MSG_BG, MAIN_BG, SECONDARY } from '~/lib/config';
+import { API_KEY, CLIENT_MSG_BG, MAIN_BG, SECONDARY } from '~/lib/config';
+import { useAppContext } from '~/lib/contexts/AppContext';
 
 export default function DocChat() {
   const { colorMode } = useColorMode();
   const chatContainerRef: React.RefObject<HTMLDivElement> = useRef(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
-
+  const { setLoading, loading } = useAppContext();
   const {
     temperature,
     systemMessage,
@@ -40,6 +42,8 @@ export default function DocChat() {
     setWebsckt,
     chatModel,
     sourcesEnabled,
+    isChecked,
+    params,
   } = useChatContext();
   const [question, setQuestion] = useState('');
   const [shouldScroll, setShouldScroll] = useState(true);
@@ -61,23 +65,55 @@ export default function DocChat() {
     }
   };
 
-  function sendMessage(event: any) {
+  // function sendMessage(event: any) {
+  //   event.preventDefault();
+  //   if (question === '') {
+  //     return;
+  //   }
+  //   websckt.send(
+  //     JSON.stringify({
+  //       question,
+  //       system: systemMessage,
+  //       temperature: temperature / 100,
+  //       model: chatModel,
+  //       sources: sourcesEnabled,
+  //     })
+  //   );
+  //   setQuestion('');
+  //   inputRef.current?.focus();
+  // }
+
+  const sendMessage = async (event: any) => {
     event.preventDefault();
     if (question === '') {
       return;
     }
-    websckt.send(
-      JSON.stringify({
+    setLoading(true);
+    const chatClient = new ChatClient();
+    try {
+      const res = await chatClient.sendContextChatMessage(API_KEY, {
+        channel: params.session,
         question,
         system: systemMessage,
         temperature: temperature / 100,
         model: chatModel,
-        sources: sourcesEnabled,
-      })
-    );
-    setQuestion('');
-    inputRef.current?.focus();
-  }
+        sources: isChecked,
+        context: {
+          faiss: {
+            bucket_name: params.bucketName,
+            path: params.filePath,
+          },
+        },
+      });
+      console.log(res.data);
+      setQuestion('');
+      inputRef.current?.focus();
+    } catch (error: any) {
+      console.error(error);
+      alert(error.response.data.detail);
+    }
+    setLoading(false);
+  };
 
   useEffect(() => {
     setConnected(false);

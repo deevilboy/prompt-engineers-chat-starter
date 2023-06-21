@@ -19,6 +19,7 @@ export default function ChatProvider({ children }: IContextProvider) {
   const [websckt, setWebsckt] = useState<WebSocket>();
   const [connected, setConnected] = useState(true);
   // Settings
+  const [isChecked, setIsChecked] = useState(false);
   const [sourcesEnabled, setSourcesEnabled] = useState(false);
   const [chatModel, setChatModel] = useState(DEFAULT_CHAT_MODEL);
   const [header, setHeader] = useState('');
@@ -30,6 +31,7 @@ export default function ChatProvider({ children }: IContextProvider) {
   const [params, setParams] = useState({
     bucketName: AWS_BUCKET_NAME || 'prompt-engineers-dev',
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
+    session: Date.now(),
   });
   const [wsUrl, setWsUrl] = useState(
     HAS_PROXY
@@ -208,6 +210,8 @@ export default function ChatProvider({ children }: IContextProvider) {
         sourcesEnabled,
         setSourcesEnabled,
         resetSession,
+        isChecked,
+        setIsChecked,
       }}
     >
       {children}

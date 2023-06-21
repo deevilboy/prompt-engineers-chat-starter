@@ -1,6 +1,8 @@
+export const API_URL =
+  process.env.NEXT_PUBLIC_HOST || 'https://api.promptengineers.ai';
 export const HOST =
   process.env.NEXT_PUBLIC_HOST || 'wss://api.promptengineers.ai';
-export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY;
+export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY || '';
 export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY === 'true';
 
 export const AWS_BUCKET_NAME =
@@ -15,7 +17,7 @@ export enum ChatModels {
 }
 
 export const DEFAULT_CHAT_MODEL =
-  process.env.NEXT_PUBLIC_DEFAULT_CHAT_MODEL || ChatModels.GPT_3_5;
+  process.env.NEXT_PUBLIC_DEFAULT_CHAT_MODEL || ChatModels.GPT_3_5_16K;
 
 export const APP_TITLE = process.env.NEXT_PUBLIC_APP_TITLE || 'Langchain GPT';
 export const APP_VERSION = process.env.NEXT_PUBLIC_APP_VERSION || '';
