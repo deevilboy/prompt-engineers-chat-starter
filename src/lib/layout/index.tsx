@@ -5,13 +5,20 @@ import {
   Link as ChakraLink,
   Text,
   useMediaQuery,
+  Image,
 } from '@chakra-ui/react';
 import Link from 'next/link';
 import type { ReactNode } from 'react';
 import { IoMdAdd } from 'react-icons/io';
-// import SettingsDrawer from '../components/drawers/SettingsDrawer';
 
-import { APP_TITLE, APP_VERSION, CONTEXT_LINK } from '../config';
+import {
+  APP_TITLE,
+  APP_VERSION,
+  CONTEXT_LINK,
+  LOGO_LINK,
+  SECONDARY,
+  SIDEBAR_COLOR,
+} from '../config';
 import { useChatContext } from '../contexts/ChatContext';
 
 import Header from './Header';
@@ -37,16 +44,19 @@ const Layout = ({ children }: LayoutProps) => {
             flex="0 0 auto"
             h={isLargerThanLG ? '100vh' : '80vh'}
             width={{ base: '0%', lg: '15%' }}
-            bg="rgb(23, 25, 35)"
+            bg={SIDEBAR_COLOR}
             position="relative"
             pt={3}
             color="white"
           >
             {isLargerThanLG && (
               <Box textAlign="center">
-                <ChakraLink href={CONTEXT_LINK}>{APP_TITLE}</ChakraLink>{' '}
+                <ChakraLink href={CONTEXT_LINK} color={SECONDARY}>
+                  {APP_TITLE}
+                </ChakraLink>{' '}
+                {/* <Image src={LOGO_LINK} alt="Form.io" /> */}
                 {APP_VERSION ? `- ${APP_VERSION}` : null}
-                <Text fontSize="xs" colorScheme="blue">
+                <Text fontSize="xs" colorScheme="green">
                   <Link
                     href="https://promptengineers.ai"
                     // isExternal

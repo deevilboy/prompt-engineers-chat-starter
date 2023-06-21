@@ -18,7 +18,8 @@
     "format": "prettier --write src",
     "up-interactive": "yarn up -i",
     "up-latest": "yarn up-interactive -L",
-    "push-release": "git push --follow-tags origin main"
+    "push-release": "git push --follow-tags origin main",
+    "start-websocket-proxy": "node websocket-proxy"
   },
   "dependencies": {
     "@chakra-ui/react": "^2.5.5",
@@ -33,7 +34,8 @@
     "react-icons": "^4.8.0",
     "react-markdown": "^8.0.6",
     "react-syntax-highlighter": "^15.5.0",
-    "rehype-raw": "^6.1.1"
+    "rehype-raw": "^6.1.1",
+    "ws": "^8.13.0"
   },
   "devDependencies": {
     "@commitlint/config-conventional": "^17.4.4",

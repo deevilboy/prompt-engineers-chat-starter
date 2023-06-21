@@ -13,7 +13,7 @@ class MyDocument extends Document {
 
   render() {
     return (
-      <Html lang="en">
+      <Html lang="en" style={{ background: '#333' }}>
         <Head>
           <link
             href="https://fonts.googleapis.com/css2?family=Figtree:wght@300..900&display=swap"

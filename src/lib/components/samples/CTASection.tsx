@@ -47,7 +47,7 @@ const CTASection = () => {
         >
           Use This Template
         </Button>
-        {/* <Button
+        <Button
           as="a"
           href={repoLink}
           target="_blank"
@@ -55,7 +55,7 @@ const CTASection = () => {
           size="sm"
         >
           Open in Github
-        </Button> */}
+        </Button>
       </Flex>
     </Box>
   );

@@ -7,13 +7,13 @@ import ThemeToggle from './ThemeToggle';
 
 const Header = () => {
   return (
-    <Flex as="header" width="full" align="center" py={2}>
+    <Flex as="header" width="full" align="center" py={2} bg="#000">
       <Box>
         <ChakraLink ml={5} href={CONTEXT_LINK}>
           {APP_TITLE}
         </ChakraLink>{' '}
         {APP_VERSION ? `- ${APP_VERSION}` : null}
-        <Text fontSize="xs" ml={5} colorScheme="blue">
+        <Text fontSize="xs" ml={5} colorScheme="green">
           <Link
             href="https://promptengineers.ai"
             // isExternal
@@ -23,9 +23,9 @@ const Header = () => {
           </Link>
         </Text>
       </Box>
-      <Box marginLeft="auto" mr={2}>
+      {/* <Box marginLeft="auto" mr={2}>
         <ThemeToggle />
-      </Box>
+      </Box> */}
     </Flex>
   );
 };

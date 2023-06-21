@@ -29,7 +29,7 @@
     "**/*.tsx",
     "src",
     "commitlint.config.js"
-  ],
+, "websocket-proxy/index.js"  ],
   "exclude": [
     "node_modules"
   ]

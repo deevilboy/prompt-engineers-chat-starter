@@ -1,4 +1,4 @@
-const APP_NAME = 'Formio GPT';
+import { APP_NAME } from '../config';
 
 const Meta = () => {
   return (
