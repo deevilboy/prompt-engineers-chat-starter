@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useContext, createContext, useState, useEffect } from 'react';
 
 import {
@@ -16,6 +17,7 @@ import { removeElementsFromIndex } from '../utils/format';
 export const ChatContext = createContext({});
 
 export default function ChatProvider({ children }: IContextProvider) {
+  const router = useRouter();
   const [websckt, setWebsckt] = useState<WebSocket>();
   const [connected, setConnected] = useState(true);
   // Settings
@@ -33,11 +35,7 @@ export default function ChatProvider({ children }: IContextProvider) {
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
     session: Date.now(),
   });
-  const [wsUrl, setWsUrl] = useState(
-    HAS_PROXY
-      ? `${HOST}/ws/proxy`
-      : `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
-  );
+  const [wsUrl, setWsUrl] = useState(``);
 
   const addMessage = (content: any, className: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, className }]);
@@ -93,11 +91,20 @@ export default function ChatProvider({ children }: IContextProvider) {
       console.log('resetting session');
       setMessages([]);
       websckt?.close();
+      const timeNow = Date.now();
+      setParams({
+        ...params,
+        session: timeNow
+      })
+      router.replace({
+          pathname: router.pathname,
+          query: { ...router.query, channel: timeNow },
+      }, undefined, { shallow: true });
       // This will not connect but is here to reset the connection by changing the wsUrl
-      setWsUrl(`${HOST}/ws/proxy?test=1234`);
+      setWsUrl(``);
       // This will reconnect to create a new session
       setTimeout(() => {
-        setWsUrl(`${HOST}/ws/proxy`);
+        setWsUrl(`${HOST}/ws/proxy?session=${params.session}`);
       }, 500);
     } else {
       console.log('resetting session');
@@ -108,7 +115,7 @@ export default function ChatProvider({ children }: IContextProvider) {
       // This will reconnect to create a new session
       setTimeout(() => {
         setWsUrl(
-          `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
+          `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
         );
       }, 500);
     }

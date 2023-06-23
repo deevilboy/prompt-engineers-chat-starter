@@ -20,7 +20,7 @@ import { useChatContext } from '../../contexts/ChatContext';
 import { ChatClient } from '../../utils/api';
 import CTASection from '../samples/CTASection';
 import SomeText from '../samples/SomeText';
-import { API_KEY, CLIENT_MSG_BG, MAIN_BG, SECONDARY } from '~/lib/config';
+import { API_KEY, CLIENT_MSG_BG, HAS_PROXY, HOST, MAIN_BG, SECONDARY } from '~/lib/config';
 import { useAppContext } from '~/lib/contexts/AppContext';
 
 export default function DocChat() {
@@ -42,6 +42,7 @@ export default function DocChat() {
     setWebsckt,
     chatModel,
     sourcesEnabled,
+    setWsUrl,
     isChecked,
     params,
   } = useChatContext();
@@ -110,26 +111,28 @@ export default function DocChat() {
       inputRef.current?.focus();
     } catch (error: any) {
       console.error(error);
-      alert(error.response.data.detail);
+      // alert(error.response.data.detail);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    setConnected(false);
-    const ws = new WebSocket(wsUrl);
-    setWebsckt(ws);
-    ws.onopen = (event) => {
-      console.log('Connected!');
-      setConnected(true);
-    };
-    ws.onmessage = function (event) {
-      loadMessages(event);
-    };
-
-    return () => {
-      ws.close();
-    };
+    // setConnected(false);
+    if (wsUrl) {
+      const ws = new WebSocket(wsUrl);
+      setWebsckt(ws);
+      ws.onopen = (event) => {
+          console.log("Connected!");
+          setConnected(true);
+      };
+      ws.onmessage = function (event) {
+          loadMessages(event);
+      };
+  
+      return () => {
+          ws.close();
+      };
+  }
   }, [wsUrl]);
 
   useEffect(() => {
@@ -146,6 +149,16 @@ export default function DocChat() {
       setSendButtonColor(newColor);
     }
   }, [question]);
+
+  useEffect(() => {
+      if (wsUrl && params.filePath && params.session) {
+          setWsUrl(
+            HAS_PROXY
+            ? `${HOST}/ws/proxy?session=${params.session}`
+            : `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
+          );
+      }
+    }, [params.session, wsUrl])
 
   useEffect(() => {
     setHeader(connected ? 'What can I help you accomplish?' : '📡 Loading...');
