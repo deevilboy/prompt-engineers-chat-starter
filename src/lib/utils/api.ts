@@ -55,7 +55,7 @@ export class ChatClient extends API {
     }
   ) {
     const options = this.getHeaders(token, 'bot');
-    let url = `${API_URL}/api/v1/chat/vectorstore/message`;
+    let url = `${API_URL}/api/proxy`;
     if (payload.channel) {
       url += '?';
       if (payload.channel) {

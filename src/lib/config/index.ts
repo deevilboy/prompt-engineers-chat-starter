@@ -1,7 +1,7 @@
 export const API_URL =
-  process.env.NEXT_PUBLIC_HOST || 'https://api.promptengineers.ai';
-export const HOST =
-  process.env.NEXT_PUBLIC_HOST || 'wss://api.promptengineers.ai';
+  process.env.NEXT_PUBLIC_API_HOST || 'https://api.promptengineers.ai';
+export const WS_URL =
+  process.env.NEXT_PUBLIC_WS_HOST || 'wss://api.promptengineers.ai';
 export const API_KEY = process.env.NEXT_PUBLIC_PE_API_KEY || '';
 export const HAS_PROXY = process.env.NEXT_PUBLIC_HAS_PROXY === 'true';
 
