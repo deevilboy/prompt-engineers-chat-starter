@@ -6,7 +6,7 @@ import {
   AWS_BUCKET_NAME,
   DEFAULT_CHAT_MODEL,
   HAS_PROXY,
-  HOST,
+  WS_URL,
   VECTORSTORE_FILE_PATH,
 } from '../config';
 import { Defaults } from '../config/prompt';
@@ -104,18 +104,18 @@ export default function ChatProvider({ children }: IContextProvider) {
       setWsUrl(``);
       // This will reconnect to create a new session
       setTimeout(() => {
-        setWsUrl(`${HOST}/ws/proxy?session=${params.session}`);
+        setWsUrl(`${WS_URL}/ws/proxy?session=${params.session}`);
       }, 500);
     } else {
       console.log('resetting session');
       setMessages([]);
       websckt?.close();
       // This will not connect but is here to reset the connection by changing the wsUrl
-      setWsUrl(`${HOST}/ws/v1/chat/vectorstore`);
+      setWsUrl(`${WS_URL}/ws/v1/chat/vectorstore`);
       // This will reconnect to create a new session
       setTimeout(() => {
         setWsUrl(
-          `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
+          `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
         );
       }, 500);
     }

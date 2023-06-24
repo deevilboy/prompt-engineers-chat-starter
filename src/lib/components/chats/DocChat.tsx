@@ -20,7 +20,7 @@ import { useChatContext } from '../../contexts/ChatContext';
 import { ChatClient } from '../../utils/api';
 import CTASection from '../samples/CTASection';
 import SomeText from '../samples/SomeText';
-import { API_KEY, CLIENT_MSG_BG, HAS_PROXY, HOST, MAIN_BG, SECONDARY } from '~/lib/config';
+import { API_KEY, CLIENT_MSG_BG, HAS_PROXY, WS_URL, MAIN_BG, SECONDARY } from '~/lib/config';
 import { useAppContext } from '~/lib/contexts/AppContext';
 
 export default function DocChat() {
@@ -154,8 +154,8 @@ export default function DocChat() {
       if (wsUrl && params.filePath && params.session) {
           setWsUrl(
             HAS_PROXY
-            ? `${HOST}/ws/proxy?session=${params.session}`
-            : `${HOST}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
+            ? `${WS_URL}/ws/proxy?session=${params.session}`
+            : `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
           );
       }
     }, [params.session, wsUrl])
