@@ -132,7 +132,7 @@ export default function ChatProvider({ children }: IContextProvider) {
    */
   const loadMessages = (event: any) => {
     const data = JSON.parse(event.data);
-    // console.log(data);
+    console.log(data);
     if (data.sender === 'bot') {
       if (data.type === 'start') {
         setHeader('Computing answer...');
@@ -149,7 +149,7 @@ export default function ChatProvider({ children }: IContextProvider) {
         updateLastMessage(data.message);
       }
     } else {
-      addMessage(data.message, 'client-message');
+      addMessage(`${data.message}`, 'client-message');
     }
   };
 
