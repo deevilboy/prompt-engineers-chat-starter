@@ -66,9 +66,8 @@ const Layout = ({ children }: LayoutProps) => {
                   </Link>
                 </Text>
                 <Button
-                  color={SECONDARY}
                   onClick={resetSession}
-                  // colorScheme="teal"
+                  colorScheme="teal"
                   variant="outline"
                   leftIcon={<IoMdAdd />}
                   mt={3}

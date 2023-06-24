@@ -1,3 +1,4 @@
+import { useRouter } from 'next/router';
 import { useContext, createContext, useState, useEffect } from 'react';
 
 import {
@@ -5,7 +6,7 @@ import {
   AWS_BUCKET_NAME,
   DEFAULT_CHAT_MODEL,
   HAS_PROXY,
-  HOST,
+  WS_URL,
   VECTORSTORE_FILE_PATH,
 } from '../config';
 import { Defaults } from '../config/prompt';
@@ -16,9 +17,11 @@ import { removeElementsFromIndex } from '../utils/format';
 export const ChatContext = createContext({});
 
 export default function ChatProvider({ children }: IContextProvider) {
+  const router = useRouter();
   const [websckt, setWebsckt] = useState<WebSocket>();
   const [connected, setConnected] = useState(true);
   // Settings
+  const [isChecked, setIsChecked] = useState(false);
   const [sourcesEnabled, setSourcesEnabled] = useState(false);
   const [chatModel, setChatModel] = useState(DEFAULT_CHAT_MODEL);
   const [header, setHeader] = useState('');
@@ -30,12 +33,9 @@ export default function ChatProvider({ children }: IContextProvider) {
   const [params, setParams] = useState({
     bucketName: AWS_BUCKET_NAME || 'prompt-engineers-dev',
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
+    session: Date.now(),
   });
-  const [wsUrl, setWsUrl] = useState(
-    HAS_PROXY
-      ? `${HOST}/formio-proxy`
-      : `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
-  );
+  const [wsUrl, setWsUrl] = useState(``);
 
   const addMessage = (content: any, className: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, className }]);
@@ -91,22 +91,31 @@ export default function ChatProvider({ children }: IContextProvider) {
       console.log('resetting session');
       setMessages([]);
       websckt?.close();
+      const timeNow = Date.now();
+      setParams({
+        ...params,
+        session: timeNow
+      })
+      router.replace({
+          pathname: router.pathname,
+          query: { ...router.query, channel: timeNow },
+      }, undefined, { shallow: true });
       // This will not connect but is here to reset the connection by changing the wsUrl
-      setWsUrl(`${HOST}/formio-proxy?test=1234`);
+      setWsUrl(``);
       // This will reconnect to create a new session
       setTimeout(() => {
-        setWsUrl(`${HOST}/formio-proxy`);
+        setWsUrl(`${WS_URL}/ws/proxy?session=${params.session}`);
       }, 500);
     } else {
       console.log('resetting session');
       setMessages([]);
       websckt?.close();
       // This will not connect but is here to reset the connection by changing the wsUrl
-      setWsUrl(`${HOST}/chat-vector-db`);
+      setWsUrl(`${WS_URL}/ws/v1/chat/vectorstore`);
       // This will reconnect to create a new session
       setTimeout(() => {
         setWsUrl(
-          `${HOST}/chat-vector-db?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}`
+          `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
         );
       }, 500);
     }
@@ -123,7 +132,7 @@ export default function ChatProvider({ children }: IContextProvider) {
    */
   const loadMessages = (event: any) => {
     const data = JSON.parse(event.data);
-    // console.log(data);
+    // console.log(data.message);
     if (data.sender === 'bot') {
       if (data.type === 'start') {
         setHeader('Computing answer...');
@@ -140,7 +149,7 @@ export default function ChatProvider({ children }: IContextProvider) {
         updateLastMessage(data.message);
       }
     } else {
-      addMessage(data.message, 'client-message');
+      addMessage(`${data.message}`, 'client-message');
     }
   };
 
@@ -208,6 +217,8 @@ export default function ChatProvider({ children }: IContextProvider) {
         sourcesEnabled,
         setSourcesEnabled,
         resetSession,
+        isChecked,
+        setIsChecked,
       }}
     >
       {children}

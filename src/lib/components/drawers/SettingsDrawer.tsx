@@ -164,12 +164,11 @@ export default function SettingsDrawer() {
                     onChange={handleModelChange}
                     value={chatModel}
                   >
-                    <option value={ChatModels.GPT_3_5}>
-                      gpt-3.5-turbo &#40;Faster&#41;
+                    <option value={ChatModels.GPT_3_5}>gpt-3.5-turbo</option>
+                    <option value={ChatModels.GPT_3_5_16K}>
+                      gpt-3.5-turbo-16k
                     </option>
-                    <option value={ChatModels.GPT_4}>
-                      gpt-4 &#40;Smarter&#41;
-                    </option>
+                    <option value={ChatModels.GPT_4}>gpt-4</option>
                   </Select>
                 </FormControl>
                 <Box mt={3}>
