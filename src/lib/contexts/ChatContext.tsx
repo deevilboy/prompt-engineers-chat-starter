@@ -132,7 +132,7 @@ export default function ChatProvider({ children }: IContextProvider) {
    */
   const loadMessages = (event: any) => {
     const data = JSON.parse(event.data);
-    console.log(data);
+    // console.log(data.message);
     if (data.sender === 'bot') {
       if (data.type === 'start') {
         setHeader('Computing answer...');
