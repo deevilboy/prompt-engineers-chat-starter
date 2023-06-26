@@ -130,6 +130,13 @@ export default function ChatProvider({ children }: IContextProvider) {
   }, [chatModel]);
 
   useEffect(() => {
+    const prevExists = sessionStorage.getItem('sources') || false;
+    if (prevExists) {
+        setIsChecked(prevExists === 'false' ? false : true);
+    }
+  }, [isChecked])
+
+  useEffect(() => {
     const prevMessageExists = sessionStorage.getItem('systemMessage');
     if (prevMessageExists) {
       setSystemMessage(prevMessageExists);
