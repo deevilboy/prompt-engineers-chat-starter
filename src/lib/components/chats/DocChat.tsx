@@ -111,13 +111,12 @@ export default function DocChat() {
       inputRef.current?.focus();
     } catch (error: any) {
       console.error(error);
-      // alert(error.response.data.detail);
+      alert(error.response.data.detail);
     }
     setLoading(false);
   };
 
   useEffect(() => {
-    // setConnected(false);
     if (wsUrl) {
       const ws = new WebSocket(wsUrl);
       setWebsckt(ws);
@@ -151,14 +150,14 @@ export default function DocChat() {
   }, [question]);
 
   useEffect(() => {
-      if (wsUrl && params.filePath && params.session) {
-          setWsUrl(
-            HAS_PROXY
-            ? `${WS_URL}/ws/proxy?session=${params.session}`
-            : `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
-          );
-      }
-    }, [params.session, wsUrl])
+    if (wsUrl && params.filePath && params.session) {
+      setWsUrl(
+        HAS_PROXY
+        ? `${WS_URL}/ws/proxy?session=${params.session}`
+        : `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
+      );
+    }
+  }, [params.session, wsUrl])
 
   useEffect(() => {
     setHeader(connected ? 'What can I help you accomplish?' : '📡 Loading...');
@@ -170,14 +169,15 @@ export default function DocChat() {
 
   return (
     <Box height="100%" bg="#333">
-      <Box>
+      <Box className='chat-window'>
         {messages.length > 0 ? (
           <Box
             ref={chatContainerRef}
             onScroll={handleScroll}
             className="main-window"
+            flexGrow={1}
           >
-            <div ref={messagesRef}>
+            <Box ref={messagesRef}>
               {messages.map((message: any, index: number) => (
                 <Box
                   key={index}
@@ -257,12 +257,13 @@ export default function DocChat() {
                   </ReactMarkdown>
                 </Box>
               ))}
-            </div>
+            </Box>
           </Box>
         ) : (
           <Box
             ref={chatContainerRef}
             className="main-window"
+            flexGrow={1}
             style={{
               display: 'flex',
               alignItems: 'center',
@@ -280,6 +281,7 @@ export default function DocChat() {
       <Box
         className="chat-input-space"
         bg={useColorModeValue('white-smoke', MAIN_BG)}
+        bottom={3.5}
       >
         <Box textAlign="center" height="24px">
           {header}

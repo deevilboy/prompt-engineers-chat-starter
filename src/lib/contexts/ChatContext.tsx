@@ -1,6 +1,5 @@
 import { useRouter } from 'next/router';
 import { useContext, createContext, useState, useEffect } from 'react';
-
 import {
   API_KEY,
   AWS_BUCKET_NAME,
@@ -12,15 +11,16 @@ import {
 import { Defaults } from '../config/prompt';
 import type { IContextProvider } from '../interfaces/Provider';
 import type { Message } from '../types/chat';
-import { removeElementsFromIndex } from '../utils/format';
+import { extractSources, removeElementsFromIndex, removeSources, wrapSourcesInAnchorTags } from '../utils/format';
 
 export const ChatContext = createContext({});
 
 export default function ChatProvider({ children }: IContextProvider) {
   const router = useRouter();
+  // Settings
   const [websckt, setWebsckt] = useState<WebSocket>();
   const [connected, setConnected] = useState(true);
-  // Settings
+  const [wsUrl, setWsUrl] = useState(``);
   const [isChecked, setIsChecked] = useState(false);
   const [sourcesEnabled, setSourcesEnabled] = useState(false);
   const [chatModel, setChatModel] = useState(DEFAULT_CHAT_MODEL);
@@ -35,9 +35,8 @@ export default function ChatProvider({ children }: IContextProvider) {
     filePath: VECTORSTORE_FILE_PATH || 'formio.pkl',
     session: Date.now(),
   });
-  const [wsUrl, setWsUrl] = useState(``);
-
-  const addMessage = (content: any, className: string) => {
+  
+  const addMessage = (content: string, className: string) => {
     setMessages((prevMessages) => [...prevMessages, { content, className }]);
   };
 
@@ -56,34 +55,36 @@ export default function ChatProvider({ children }: IContextProvider) {
     });
   };
 
-  const extractSources = (text: string): string[] | null => {
-    const lowerCaseText = text.toLowerCase();
-    const sourcesKeyword = 'sources:';
-    const sourcesIndex = lowerCaseText.indexOf(sourcesKeyword);
-
-    if (sourcesIndex === -1) {
-      return null;
+  /**
+   * Loads the messages into the UI
+   * @param event
+   */
+   function loadMessages (event: any) {
+    const data = JSON.parse(event.data);
+    console.log(data.message);
+    if (data.sender === 'bot') {
+      if (data.type === 'start') {
+        setHeader('Computing answer...');
+        addMessage('', 'server-message');
+      } else if (data.type === 'stream') {
+        setHeader('Chatbot is typing...');
+        updateLastMessage(data.message);
+      } else if (data.type === 'info') {
+        setHeader(data.message);
+      } else if (data.type === 'end') {
+        setHeader('Ask a question');
+      } else if (data.type === 'error') {
+        setHeader('Ask a question');
+        updateLastMessage(data.message);
+      }
+    } else {
+      addMessage(`${data.message}`, 'client-message');
     }
-
-    const sourcesText = text.substring(sourcesIndex + sourcesKeyword.length);
-    return sourcesText.split(/,|\n-/).map((source) => source.trim());
   };
 
-  const wrapSourcesInAnchorTags = (sources: string[]): string[] => {
-    return sources.map(
-      (source) =>
-        `<a href="${source.replace(
-          'rtdocs',
-          'https:/'
-        )}" target="_blank" class="source-link"><div class="well">${source.replace(
-          'rtdocs',
-          'https:/'
-        )}</div></a>`
-    );
-  };
-
-  const removeSources = (text: string): string => {
-    return text.replace(/(sources:)[\s\S]*/i, '').trim();
+  const disconnect = () => {
+    setConnected(false);
+    // websckt?.close();
   };
 
   const resetSession = () => {
@@ -118,38 +119,6 @@ export default function ChatProvider({ children }: IContextProvider) {
           `${WS_URL}/ws/v1/chat/vectorstore?api_key=${API_KEY}&bucket=${params.bucketName}&path=${params.filePath}&session=${params.session}`
         );
       }, 500);
-    }
-  };
-
-  const disconnect = () => {
-    setConnected(false);
-    websckt?.close();
-  };
-
-  /**
-   * Loads the messages into the UI
-   * @param event
-   */
-  const loadMessages = (event: any) => {
-    const data = JSON.parse(event.data);
-    // console.log(data.message);
-    if (data.sender === 'bot') {
-      if (data.type === 'start') {
-        setHeader('Computing answer...');
-        addMessage('', 'server-message');
-      } else if (data.type === 'stream') {
-        setHeader('Chatbot is typing...');
-        updateLastMessage(data.message);
-      } else if (data.type === 'info') {
-        setHeader(data.message);
-      } else if (data.type === 'end') {
-        setHeader('Ask a question');
-      } else if (data.type === 'error') {
-        setHeader('Ask a question');
-        updateLastMessage(data.message);
-      }
-    } else {
-      addMessage(`${data.message}`, 'client-message');
     }
   };
 

@@ -46,6 +46,13 @@
   padding: 10px 20%;
 }
 
+.chat-window {
+  display: flex;
+  flex-direction: column;
+  height: 85%;
+  position: relative;
+}
+
 .chat-input-space {
   padding: 0px 20%;
 }
@@ -53,7 +60,7 @@
 .main-window {
   height: 87vh;
   overflow-y: scroll;
-  max-width: 99vw;
+  /* max-width: 99vw; */
 }
 
 .server-message {
@@ -89,7 +96,7 @@
 
 @media (max-width: 500px) {
   .main-window {
-    height: 76vh;
+    height: 93vh;
   }
 }
 
@@ -98,8 +105,17 @@
     padding: 10px 2%;
   }
 
+  .chat-window {
+    display: flex;
+    flex-direction: column;
+    height: 85%;
+  }
+
   .chat-input-space {
     padding: 0px 10px 20px;
+    position: fixed;
+    width: 100%;
+    bottom: 10;
   }
 
   .server-message {
